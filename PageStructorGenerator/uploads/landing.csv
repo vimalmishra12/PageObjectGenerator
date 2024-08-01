@@ -1,0 +1,7 @@
+Label,cssSelector,tagName,group,relation,extraInfo,returnValue,teacherAppLangEN
+headingText,.heading1.mb-3,div,landingPage,,,,"""Cambridge One"""
+subheadingText,"div[class=""main-content""] h2",div,landingPage,,,,"""Your home for digital learning"""
+signupBtn,"a[qid=""home-1""]",button,landingPage,,,signup.page,"""Sign up"""
+loginBtn,"a[qid=""home-2""]",button,landingPage,,,login.page,"""Log in"""
+brandLogo_img,"img[alt=""Shield""]",img,landingPage,,isInitialization,,
+languageSelector_dropdown,"span[qid=""header-10""]",button,,,,,

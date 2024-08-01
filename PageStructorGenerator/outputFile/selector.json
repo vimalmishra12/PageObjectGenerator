@@ -1,0 +1,11 @@
+{"landing": 
+{
+"headingText" : ".heading1.mb-3",
+"subheadingText" : "div[class=\"main-content\"] h2",
+"signupBtn" : "a[qid=\"home-1\"]",
+"loginBtn" : "a[qid=\"home-2\"]",
+"brandLogo_img" : "img[alt=\"Shield\"]",
+"languageSelector_dropdown" : "span[qid=\"header-10\"]",
+
+}
+}

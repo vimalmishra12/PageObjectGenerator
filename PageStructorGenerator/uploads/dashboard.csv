@@ -1,0 +1,2 @@
+Label,cssSelector,tagName,group,relation,extraInfo,returnValue,teacherAppLangEN
+help_btn,"a[id*=""hdr-help-dd""]",button,dashboard,,isInitialization,,"""Help"""
