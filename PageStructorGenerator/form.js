@@ -505,6 +505,40 @@ function generateTestcase(
       "\nvar appShell = require('../../pages/ExperienceApp/appShell.page');"
     );
   file2.write("\nvar sts;\n\nmodule.exports = {\n");
+
+  // Add initialization test case if needed
+  for (let i = 0; i < pageSelectorFile.length; i++) {
+    if (
+      pageSelectorFile[i].extraInfo &&
+      pageSelectorFile[i].extraInfo.includes("isInitialization")
+    ) {
+      console.log(
+        "this is isinitialization: " +
+          "TST_" +
+          inputFile.substring(0, 4).toUpperCase() +
+          "_TC_" +
+          testCaseNumber +
+          " :   async function (testdata) { \n"
+      );
+
+      file2.write(
+        "TST_" +
+          inputFile.substring(0, 4).toUpperCase() +
+          "_TC_" +
+          testCaseNumber +
+          " :   async function () { \n"
+      );
+      file2.write("sts = await " + inputFile + ".isInitialized();\n");
+      file2.write(
+        'await assertion.assertEqual(sts.pageStatus, true, "' +
+          inputFile +
+          ' page status mismatch");\n'
+      );
+      file2.write("},\n\n");
+      testCaseNumber++;
+    }
+  }
+
   for (var i = 0; i < pageSelectorFile.length; i++) {
     if (pageSelectorFile[i].tagName.toLowerCase().includes("button")) {
       console.log(
