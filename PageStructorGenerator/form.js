@@ -540,7 +540,10 @@ function generateTestcase(
   }
 
   for (var i = 0; i < pageSelectorFile.length; i++) {
-    if (pageSelectorFile[i].tagName.toLowerCase().includes("button")) {
+    if (
+      pageSelectorFile[i].tagName.toLowerCase().includes("button") ||
+      pageSelectorFile[i].tagName.toLowerCase().includes("a")
+    ) {
       console.log(
         "TST_" +
           inputFile.substring(0, 4).toUpperCase() +
