@@ -1308,11 +1308,14 @@ function generateClickFunctions(
   PageTemplate
 ) {
   for (var k = 0; k < pageSelectorFile.length; k++) {
+    console.log("line 1311");
     if (
       pageSelectorFile[k].extraInfo.toLowerCase().includes("pattern") &&
-      pageSelectorFile[k].tagName.toLowerCase().includes("button") &&
+      (pageSelectorFile[k].tagName.toLowerCase().includes("button") ||
+        pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
       pageSelectorFile[k].group != ""
     ) {
+      console.log("line 1317", pageSelectorFile[k].tagName.toLowerCase());
       //   console.log("sdafd" + pageSelectorFile[k].Label)
       for (var i = 1; i < pageSelectorGroup.length; i++) {
         //   console.log(pageSelectorGroup[i].length)
@@ -1331,11 +1334,14 @@ function generateClickFunctions(
         }
       }
     } else {
+      console.log("line 1336");
       if (
-        pageSelectorFile[k].tagName.toLowerCase().includes("button") &&
+        (pageSelectorFile[k].tagName.toLowerCase().includes("button") ||
+          pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
         pageSelectorFile[k].extraInfo.toLowerCase().includes("pattern") &&
         pageSelectorFile[k].group == ""
       ) {
+        console.log("line 1342", pageSelectorFile[k].tagName.toLowerCase());
         Clickfunction(
           pageSelectorFile[k].Label,
           pageSelectorFile[k].Label,
@@ -1345,9 +1351,14 @@ function generateClickFunctions(
       }
 
       if (
-        pageSelectorFile[k].tagName.toLowerCase().includes("button") &&
+        (pageSelectorFile[k].tagName.toLowerCase().includes("button") ||
+          pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
         !pageSelectorFile[k].extraInfo.includes("pattern")
       ) {
+        console.log(
+          "haha line 1356",
+          pageSelectorFile[k].tagName.toLowerCase()
+        );
         file.write(
           "\nclick_" +
             pageSelectorFile[k].Label +
