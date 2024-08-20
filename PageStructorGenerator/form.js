@@ -155,7 +155,6 @@ app.get("/getvalue", function (request, response) {
 
       if (getDataCheck) {
         //Basic Data function
-        console.log("Data function is generated");
         generategetCssPropertyData(pageSelectorFile, inputFile, cssProperty);
         //console.log(pageSelectorGroup.length)
         getDatafunction(pageSelectorFile, pageSelectorGroup, inputFile);
@@ -167,7 +166,6 @@ app.get("/getvalue", function (request, response) {
 
       if (clickFunctionsCheck) {
         // Basic Click functions
-        console.log("Click Function is generated");
         generateClickFunctions(
           pageSelectorFile,
           inputFile,
@@ -475,7 +473,10 @@ function generatePageSelectorJson(pageSelectorFile, inputFile) {
   for (var i = 0; i < pageSelectorFile.length; i++) {
     const label = pageSelectorFile[i].Label;
     const cssSelector = escapeQuotes(pageSelectorFile[i].cssSelector);
-    file1.write('"' + label + '" : "' + cssSelector + '",\n');
+
+    if (i == pageSelectorFile.length - 1)
+      file1.write('"' + label + '" : "' + cssSelector + '"\n');
+    else file1.write('"' + label + '" : "' + cssSelector + '",\n');
   }
 
   file1.write("\n}\n}");
@@ -933,23 +934,28 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
       fileEN.write("\n" + '"' + "teacher" + '": \n{\n');
       for (var i = 0; i < pageSelectorFile.length; i++) {
         if (pageSelectorFile[i].teacherAppLangEN == "") continue;
-        else if (i == pageSelectorFile.length - 2)
+        else if (i == pageSelectorFile.length - 1) {
           //last record excluding header
           fileEN.write(
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].teacherAppLangEN +
+              '"' +
               "\n"
           );
-        else
+        } else {
           fileEN.write(
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].teacherAppLangEN +
+              '"' +
               ",\n"
           );
+        }
       }
       fileEN.write("\n}");
     }
@@ -962,13 +968,15 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
 
       for (var i = 0; i < pageSelectorFile.length; i++) {
         if (pageSelectorFile[i].studentAppLangEN == "") continue;
-        else if (i == pageSelectorFile.length - 2)
+        else if (i == pageSelectorFile.length - 1)
           //last record excluding header
           fileEN.write(
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].studentAppLangEN +
+              '"' +
               "\n"
           );
         else
@@ -976,7 +984,9 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].studentAppLangEN +
+              '"' +
               ",\n"
           );
       }
@@ -1000,13 +1010,15 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
 
       for (var i = 0; i < pageSelectorFile.length; i++) {
         if (pageSelectorFile[i].teacherAppLangES == "") continue;
-        else if (i == pageSelectorFile.length - 2)
+        else if (i == pageSelectorFile.length - 1)
           //last record excluding header
           fileES.write(
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              "'" +
               pageSelectorFile[i].teacherAppLangES +
+              '"' +
               "\n"
           );
         else
@@ -1014,7 +1026,9 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].teacherAppLangES +
+              '"' +
               ",\n"
           );
       }
@@ -1029,13 +1043,15 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
 
       for (var i = 0; i < pageSelectorFile.length; i++) {
         if (pageSelectorFile[i].studentAppLangES == "") continue;
-        else if (i == pageSelectorFile.length - 2)
+        else if (i == pageSelectorFile.length - 1)
           //last record excluding header
           fileES.write(
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].studentAppLangES +
+              '"' +
               "\n"
           );
         else
@@ -1043,7 +1059,9 @@ function generateAppDataJson(pageSelectorFile, inputFile) {
             '"' +
               pageSelectorFile[i].Label +
               '" : ' +
+              '"' +
               pageSelectorFile[i].studentAppLangES +
+              '"' +
               ",\n"
           );
       }
@@ -1308,15 +1326,12 @@ function generateClickFunctions(
   PageTemplate
 ) {
   for (var k = 0; k < pageSelectorFile.length; k++) {
-    // console.log("line 1311");
     if (
       pageSelectorFile[k].extraInfo.toLowerCase().includes("pattern") &&
       (pageSelectorFile[k].tagName.toLowerCase().includes("button") ||
         pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
       pageSelectorFile[k].group != ""
     ) {
-      // console.log("line 1317", pageSelectorFile[k].tagName.toLowerCase());
-      //   console.log("sdafd" + pageSelectorFile[k].Label)
       for (var i = 1; i < pageSelectorGroup.length; i++) {
         //   console.log(pageSelectorGroup[i].length)
         for (var j = 0; j < pageSelectorGroup[i].length; j++) {
@@ -1334,14 +1349,12 @@ function generateClickFunctions(
         }
       }
     } else {
-      // console.log("line 1336");
       if (
         (pageSelectorFile[k].tagName.toLowerCase().includes("button") ||
           pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
         pageSelectorFile[k].extraInfo.toLowerCase().includes("pattern") &&
         pageSelectorFile[k].group == ""
       ) {
-        // console.log("line 1342", pageSelectorFile[k].tagName.toLowerCase());
         Clickfunction(
           pageSelectorFile[k].Label,
           pageSelectorFile[k].Label,
@@ -1355,10 +1368,6 @@ function generateClickFunctions(
           pageSelectorFile[k].tagName.toLowerCase().includes("a")) &&
         !pageSelectorFile[k].extraInfo.includes("pattern")
       ) {
-        // console.log(
-        //   "haha line 1356",
-        //   pageSelectorFile[k].tagName.toLowerCase()
-        // );
         file.write(
           "\nclick_" +
             pageSelectorFile[k].Label +
