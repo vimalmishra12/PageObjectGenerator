@@ -1,8 +1,8 @@
-{"reset": 
+{"landing": 
 {
 "teacher": 
 {
-"resetPassword" : "Reset password"
+"loginBtn" : Log in,
 
 }
 }

@@ -1,6 +1,6 @@
-{"reset": 
+{"landing": 
 {
-"resetPassword" : "form[I\"d=gigya-reset-password-form\"] div h2"
+"loginBtn" : "a[qid=\"home-2\"]",
 
 }
 }
