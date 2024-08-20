@@ -1,0 +1,10 @@
+Label,cssSelector,tagName,group,relation,extraInfo,returnValue,teacherAppLangEN
+page_header,"h2[class='gigya-composite-control gigya-composite-control-header login-heading']
+",h2,,,isInitialization,,
+brandLogo,img[alt='Cambridge Logo'],img,,,,,
+userName_tbox,#gigya-loginID-56269462240752180,input,,,,,Want to use a different
+password_tbox,#gigya-password-56383998600152700,input,,,,,Password*
+loginPassword_eye,a[aria-label='Show'],a,,,,,Show
+forgotPassword,a[title='Forgotten your password?'],a,,,,,Forgotten your password?
+login_btn,input[value='Log in'],button,,,,dashboard.page,Log in
+signup_btn,"a[title=""Don't have an account yet?""]",button,,,,signup.page,Don't have an account yet?

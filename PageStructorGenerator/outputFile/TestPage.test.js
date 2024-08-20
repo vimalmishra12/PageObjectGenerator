@@ -1,32 +1,32 @@
 "use strict";
-var landing= require('../../pages/ExperienceApp/landing.page.js');
+var TestPage= require('../../pages/ExperienceApp/TestPage.page.js');
 var sts;
 
 module.exports = {
-TST_LAND_TC_1 :   async function () { 
-sts = await landing.isInitialized();
-await assertion.assertEqual(sts.pageStatus, true, "landing page status mismatch");
+TST_TEST_TC_1 :   async function () { 
+sts = await TestPage.isInitialized();
+await assertion.assertEqual(sts.pageStatus, true, "TestPage page status mismatch");
 },
 
-TST_LAND_TC_2 :   async function (testdata) { 
-sts = await landing.click_signupBtn();
+TST_TEST_TC_2 :   async function (testdata) { 
+sts = await TestPage.click_signupBtn();
 await assertion.assertEqual(sts.pageStatus, true,"Page is not launched. ");
 
 },
 
-TST_LAND_TC_3 :   async function (testdata) { 
-sts = await landing.click_loginBtn();
+TST_TEST_TC_3 :   async function (testdata) { 
+sts = await TestPage.click_loginBtn();
 await assertion.assertEqual(sts.pageStatus, true,"Page is not launched. ");
 
 },
 
-TST_LAND_TC_4 :   async function (testdata) { 
-sts = await landing.click_languageSelector_dropdown();
+TST_TEST_TC_4 :   async function (testdata) { 
+sts = await TestPage.click_languageSelector_dropdown();
 await assertion.assertEqual(sts, true,"languageSelector_dropdown are not Clicked");
 },
 
-TST_LAND_TC_5 :   async function (testdata) { 
-sts = await landing.getData_landingPage(testdata);
+TST_TEST_TC_5 :   async function (testdata) { 
+sts = await TestPage.getData_landingPage(testdata);
 await assertion.assertEqual(sts.headingText, testdata.headingText,"headingText Values is not as expected.");
 await assertion.assertEqual(sts.subheadingText, testdata.subheadingText,"subheadingText Values is not as expected.");
 await assertion.assertEqual(sts.signupBtn, testdata.signupBtn,"signupBtn Values is not as expected.");
