@@ -1382,6 +1382,7 @@ function generateClickFunctions(
             ' is clicked");\n'
         );
         if (pageSelectorFile[k].returnValue != "") {
+          console.log("Generate return value called 1385")
           generateReturnPage(PageTemplate, pageSelectorFile[k].returnValue);
           /*     if ((pageSelectorFile[k].returnValue).toLowerCase().includes(".page"))
                              file.write("res =require" + PageTemplate.returnValue[pageSelectorFile[k].returnValue] + ";\n")
@@ -1576,30 +1577,124 @@ function Clickfunction(textcondition, selectorName, seletorRow, PageTemplate) {
   file.write("return res;\n},\n");
 }
 
+// function generateReturnPage(PageTemplate, returnValue) {
+//   const returnValueArray = returnValue.split(",");
+//   if (returnValueArray.length == 1) {
+//     if (returnValue.toLowerCase().includes(".page"))
+//       file.write(
+//         "res =await require ('./" +
+//           returnValueArray[0] +
+//           "').isInitialized();\n"
+//       );
+//     else file.write("res= await this.getData_" + returnValueArray[0] + "();");
+//   } else {
+//     file.write(
+//       "res= await action." +
+//         returnValueArray[0] +
+//         "(this." +
+//         returnValueArray[1]
+//     );
+//     if (returnValueArray.length > 2) {
+//       for (let i = 2; i < returnValueArray.length; i++)
+//         file.write("," + returnValueArray[i]);
+//     }
+//     file.write(");");
+//   }
+// }
+
+// function generateReturnPage(PageTemplate, returnValue) {
+//   const returnValueArray = returnValue.split(",");
+//   if (returnValueArray.length === 1) {
+//     if (returnValue.toLowerCase().includes(".page")) {
+//       file.write(
+//         "res = await require('./" +
+//           returnValueArray[0] +
+//           "').isInitialized();\n"
+//       );
+//     } else {
+//       file.write("res = await this.getData_" + returnValueArray[0] + "();");
+//     }
+//   }
+//   // For this case , we have to write like this  : data , groupname ,  particularElement : ex: data, notesContent , eBookHeadingText
+//   else if (returnValueArray.length == 3 && returnValueArray[0] === "data") {
+//     console.log("Special case called , 1620")
+//     const baseFunction = returnValueArray[1]; 
+//     const additionalContext = returnValueArray[returnValueArray.length - 1];
+
+//     file.write(
+//       "res = await this.getData_" +
+//         baseFunction +"()."+
+//         additionalContext +
+//         ";\n"
+//     );
+//   }else if (returnValueArray.length == 2 && returnValueArray[0] === "data") {
+//     console.log("Special case called , 1631")
+//     file.write("res = await this.getData_" + returnValueArray[1] + "();");
+//   }
+  
+//   else {
+//     file.write(
+//       "res = await action." +
+//         returnValueArray[0] +
+//         "(this." +
+//         returnValueArray[1]
+//     );
+//     if (returnValueArray.length > 2) {
+//       for (let i = 2; i < returnValueArray.length; i++) {
+//         file.write("," + returnValueArray[i]);
+//       }
+//     }
+//     file.write(");\n");
+//   }
+// }
+
+
+
 function generateReturnPage(PageTemplate, returnValue) {
   const returnValueArray = returnValue.split(",");
-  if (returnValueArray.length == 1) {
-    if (returnValue.toLowerCase().includes(".page"))
+  if (returnValueArray.length === 1) {
+    if (returnValue.toLowerCase().includes(".page")) {
       file.write(
-        "res =await require ('./" +
+        "res = await require('./" +
           returnValueArray[0] +
           "').isInitialized();\n"
       );
-    else file.write("res= await this.getData_" + returnValueArray[0] + "();");
-  } else {
+    }
+  }
+  // For this case , we have to write like this  : data , groupname ,  particularElement : ex: data, notesContent , eBookHeadingText
+  else if (returnValueArray.length == 3 && returnValueArray[0] === "data") {
+    console.log("Special case called , 1620")
+    const baseFunction = returnValueArray[1]; 
+    const additionalContext = returnValueArray[returnValueArray.length - 1];
+
     file.write(
-      "res= await action." +
+      "res = await this.getData_" +
+        baseFunction +"()."+
+        additionalContext +
+        ";\n"
+    );
+  }else if (returnValueArray.length == 2 && returnValueArray[0] === "data") {
+    console.log("Special case called , 1677")
+    file.write("res = await this.getData_" + returnValueArray[1] + "();");
+  }
+  
+  else {
+    file.write(
+      "res = await action." +
         returnValueArray[0] +
         "(this." +
         returnValueArray[1]
     );
     if (returnValueArray.length > 2) {
-      for (let i = 2; i < returnValueArray.length; i++)
+      for (let i = 2; i < returnValueArray.length; i++) {
         file.write("," + returnValueArray[i]);
+      }
     }
-    file.write(");");
+    file.write(");\n");
   }
 }
+
+
 
 function generateSetValueFunctions(pageSelectorFile) {
   for (var i = 0; i < pageSelectorFile.length; i++) {
