@@ -599,19 +599,68 @@ function generateTestcase(
           );
           // file2.write("await assertion.assertEqual(sts.appShell.header, true,\"Page header status mismatch\");")
         } else if (pageSelectorFile[i].returnValue.includes(",")) {
-          file2.write(
-            "sts = await " +
-              inputFile +
-              ".click_" +
-              pageSelectorFile[i].Label +
-              "();\n"
+          let returnValues = pageSelectorFile[i].returnValue.split(",");
+      
+          if (returnValues.length === 2) {
+              // Have to write some code here
+              console.log("Return value length is 2")
+              file2.write(
+                "sts = await " +
+                  inputFile +
+                  ".click_" +
+                  pageSelectorFile[i].Label +
+                  "();\n"
+              );
+
+              // This line is for find the matching data to which we should compare the sts
+              file2.write(
+                "groupData = await " +
+                  inputFile +
+                  ".getData_" +
+                  returnValues[1] +
+                  "();\n"
+              );
+              file2.write(
+                'await assertion.assertEqual(sts, groupData,"' +
+                  pageSelectorFile[i].Label +
+                  ' are not Clicked");'
+              );
+          } else if (returnValues.length === 3) {
+            console.log("Return value length is 3")
+            file2.write(
+              "sts = await " +
+                  inputFile +
+                  ".click_" +
+                  pageSelectorFile[i].Label +
+                  "();\n"
           );
           file2.write(
-            'await assertion.assertEqual(sts, true,"' +
-              pageSelectorFile[i].Label +
-              ' are not Clicked");'
-          );
-        } else {
+            'await assertion.assertEqual(' +
+                "  sts," +
+                "  testdata." +
+                returnValues[2].trim() +
+                ',' +
+                '  "' +
+                pageSelectorFile[i].Label +
+                ' is not clicked"\n' +
+                ");\n"
+        );
+          } else {
+              file2.write(
+                  "sts = await " +
+                      inputFile +
+                      ".click_" +
+                      pageSelectorFile[i].Label +
+                      "();\n"
+              );
+              file2.write(
+                  'await assertion.assertEqual(sts, true, "' +
+                      pageSelectorFile[i].Label +
+                      ' are not Clicked for other lengths");\n'
+              );
+          }
+      }
+       else {
           file2.write(
             "sts = await " +
               inputFile +
