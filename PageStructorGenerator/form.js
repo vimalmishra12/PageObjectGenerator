@@ -92,7 +92,6 @@ app.get("/getvalue", function (request, response) {
       }
       for (var i = 0; i < pageSelectorFile.length; i++) {
         arr[i] = pageSelectorFile[i].group;
-        // console.log(pageSelectorFile);
       }
       let unique = [...new Set(arr)];
       for (var j = 1; j <= unique.length; j++) {
@@ -482,6 +481,25 @@ function generatePageSelectorJson(pageSelectorFile, inputFile) {
   file1.write("\n}\n}");
 }
 
+// Generates and writes assertion statements based on matching group values from a selector file.
+function wrtieAssertions( i, pageSelectorFile)
+{
+  let returnValues = pageSelectorFile[i].returnValue.split(",");
+  for (var k = 0; k < pageSelectorFile.length; k++) {
+    if (returnValues.length> 1 ? returnValues[1] == pageSelectorFile[k].group : returnValues[0] == pageSelectorFile[k].group) {
+      file2.write(
+        "\nawait assertion.assertEqual(sts." +
+          pageSelectorFile[k].Label +
+          ",testdata." +
+          pageSelectorFile[k].Label +
+          ',"' +
+          pageSelectorFile[k].Label +
+          ' text mismatch");'
+      );
+    }
+  }
+}
+
 function generateTestcase(
   pageSelectorFile,
   inputFile,
@@ -545,13 +563,13 @@ function generateTestcase(
       pageSelectorFile[i].tagName.toLowerCase().includes("button") ||
       pageSelectorFile[i].tagName.toLowerCase().includes("a")
     ) {
-      console.log(
-        "TST_" +
-          inputFile.substring(0, 4).toUpperCase() +
-          "_TC_" +
-          testCaseNumber +
-          " :   async function (testdata) { \n"
-      );
+      // console.log(
+      //   "TST_" +
+      //     inputFile.substring(0, 4).toUpperCase() +
+      //     "_TC_" +
+      //     testCaseNumber +
+      //     " :   async function (testdata) { \n"
+      // );
       file2.write(
         "TST_" +
           inputFile.substring(0, 4).toUpperCase() +
@@ -572,19 +590,20 @@ function generateTestcase(
             pageSelectorFile[i].Label +
             "();"
         );
-        for (var k = 0; k < pageSelectorFile.length; k++) {
-          if (pageSelectorFile[i].returnValue == pageSelectorFile[k].group) {
-            file2.write(
-              "\nawait assertion.assertEqual(sts." +
-                pageSelectorFile[k].Label +
-                ",tesdata." +
-                pageSelectorFile[k].Label +
-                ',"' +
-                pageSelectorFile[k].Label +
-                ' text mismatch");'
-            );
-          }
-        }
+        // for (var k = 0; k < pageSelectorFile.length; k++) {
+        //   if (pageSelectorFile[i].returnValue == pageSelectorFile[k].group) {
+        //     file2.write(
+        //       "\nawait assertion.assertEqual(sts." +
+        //         pageSelectorFile[k].Label +
+        //         ",testdata." +
+        //         pageSelectorFile[k].Label +
+        //         ',"' +
+        //         pageSelectorFile[k].Label +
+        //         ' text mismatch");'
+        //     );
+        //   }
+        // }
+        wrtieAssertions(i , pageSelectorFile); 
       } else {
         if (pageSelectorFile[i].returnValue.toLowerCase().includes(".page")) {
           file2.write(
@@ -599,19 +618,58 @@ function generateTestcase(
           );
           // file2.write("await assertion.assertEqual(sts.appShell.header, true,\"Page header status mismatch\");")
         } else if (pageSelectorFile[i].returnValue.includes(",")) {
-          file2.write(
-            "sts = await " +
-              inputFile +
-              ".click_" +
-              pageSelectorFile[i].Label +
-              "();\n"
+          let returnValues = pageSelectorFile[i].returnValue.split(",");
+      
+          if (returnValues.length === 2) {
+              file2.write(
+                "sts = await " +
+                  inputFile +
+                  ".click_" +
+                  pageSelectorFile[i].Label +
+                  "();\n"
+              );
+
+              wrtieAssertions(i , pageSelectorFile); 
+
+          } else if (returnValues.length === 3) {          
+            file2.write(
+              "sts = await " +
+                  inputFile +
+                  ".click_" +
+                  pageSelectorFile[i].Label +
+                  "();\n"
           );
-          file2.write(
-            'await assertion.assertEqual(sts, true,"' +
-              pageSelectorFile[i].Label +
-              ' are not Clicked");'
+            if(pageSelectorFile[i].group == returnValues[1])
+            {
+            file2.write(
+              'await assertion.assertEqual(' +
+                  "sts," +
+                  " testdata." +
+                  returnValues[2].trim() +
+                  ',' +
+                  '  "' +
+                  pageSelectorFile[i].Label +
+                  ' is not clicked"\n' +
+                  ");\n"
           );
-        } else {
+            }
+            
+          } else {
+              file2.write(
+                  "sts = await " +
+                      inputFile +
+                      ".click_" +
+                      pageSelectorFile[i].Label +
+                      "();\n"
+              );
+              file2.write(
+                  'await assertion.assertEqual(sts, true, "' +
+                      pageSelectorFile[i].Label +
+                      ' are not Clicked for other lengths");\n'
+              );
+          }
+      }
+       else {
           file2.write(
             "sts = await " +
               inputFile +
@@ -1133,7 +1191,6 @@ function generateIsinitiazeFunction(pageSelectorFile, PageTemplate, param1) {
       "await action.waitForDocumentLoad();\nres = {\n"
   );
   for (var i = 0; i < pageSelectorFile.length; i++) {
-    // console.log(pageSelectorFile[i].extraInfo)
     if (
       pageSelectorFile[i].extraInfo.toLowerCase().includes("isinitialization")
     ) {
@@ -1382,6 +1439,7 @@ function generateClickFunctions(
             ' is clicked");\n'
         );
         if (pageSelectorFile[k].returnValue != "") {
+          // This will not generate return page if the groupName is not equal to the group that is provided in returnValue column
           generateReturnPage(PageTemplate, pageSelectorFile[k].returnValue);
           /*     if ((pageSelectorFile[k].returnValue).toLowerCase().includes(".page"))
                              file.write("res =require" + PageTemplate.returnValue[pageSelectorFile[k].returnValue] + ";\n")
@@ -1395,8 +1453,6 @@ function generateClickFunctions(
             " is NOT clicked\", 'error');\n}\n"
         );
         file.write("return res;\n},\n");
-
-        // console.log("Click function write")
       }
     }
   }
@@ -1576,30 +1632,122 @@ function Clickfunction(textcondition, selectorName, seletorRow, PageTemplate) {
   file.write("return res;\n},\n");
 }
 
+// function generateReturnPage(PageTemplate, returnValue) {
+//   const returnValueArray = returnValue.split(",");
+//   if (returnValueArray.length == 1) {
+//     if (returnValue.toLowerCase().includes(".page"))
+//       file.write(
+//         "res =await require ('./" +
+//           returnValueArray[0] +
+//           "').isInitialized();\n"
+//       );
+//     else file.write("res= await this.getData_" + returnValueArray[0] + "();");
+//   } else {
+//     file.write(
+//       "res= await action." +
+//         returnValueArray[0] +
+//         "(this." +
+//         returnValueArray[1]
+//     );
+//     if (returnValueArray.length > 2) {
+//       for (let i = 2; i < returnValueArray.length; i++)
+//         file.write("," + returnValueArray[i]);
+//     }
+//     file.write(");");
+//   }
+// }
+
+// function generateReturnPage(PageTemplate, returnValue) {
+//   const returnValueArray = returnValue.split(",");
+//   if (returnValueArray.length === 1) {
+//     if (returnValue.toLowerCase().includes(".page")) {
+//       file.write(
+//         "res = await require('./" +
+//           returnValueArray[0] +
+//           "').isInitialized();\n"
+//       );
+//     } else {
+//       file.write("res = await this.getData_" + returnValueArray[0] + "();");
+//     }
+//   }
+//   // For this case , we have to write like this  : data , groupname ,  particularElement : ex: data, notesContent , eBookHeadingText
+//   else if (returnValueArray.length == 3 && returnValueArray[0] === "data") {
+//     console.log("Special case called , 1620")
+//     const baseFunction = returnValueArray[1]; 
+//     const additionalContext = returnValueArray[returnValueArray.length - 1];
+
+//     file.write(
+//       "res = await this.getData_" +
+//         baseFunction +"()."+
+//         additionalContext +
+//         ";\n"
+//     );
+//   }else if (returnValueArray.length == 2 && returnValueArray[0] === "data") {
+//     console.log("Special case called , 1631")
+//     file.write("res = await this.getData_" + returnValueArray[1] + "();");
+//   }
+  
+//   else {
+//     file.write(
+//       "res = await action." +
+//         returnValueArray[0] +
+//         "(this." +
+//         returnValueArray[1]
+//     );
+//     if (returnValueArray.length > 2) {
+//       for (let i = 2; i < returnValueArray.length; i++) {
+//         file.write("," + returnValueArray[i]);
+//       }
+//     }
+//     file.write(");\n");
+//   }
+// }
+
+
+
 function generateReturnPage(PageTemplate, returnValue) {
   const returnValueArray = returnValue.split(",");
-  if (returnValueArray.length == 1) {
-    if (returnValue.toLowerCase().includes(".page"))
+  if (returnValueArray.length === 1) {
+    if (returnValue.toLowerCase().includes(".page")) {
       file.write(
-        "res =await require ('./" +
+        "res = await require('./" +
           returnValueArray[0] +
           "').isInitialized();\n"
       );
-    else file.write("res= await this.getData_" + returnValueArray[0] + "();");
-  } else {
+    }
+  }
+  // For this case , we have to write like this  : data , groupname ,  particularElement : ex: data, notesContent , eBookHeadingText
+  else if (returnValueArray.length == 3 && returnValueArray[0] === "data") {
+    const baseFunction = returnValueArray[1]; 
+    const additionalContext = returnValueArray[returnValueArray.length - 1];
+
     file.write(
-      "res= await action." +
+      "res = await this.getData_" +
+        baseFunction +"()."+
+        additionalContext +
+        ";\n"
+    );
+  }else if (returnValueArray.length == 2 && returnValueArray[0] === "data") {
+    file.write("res = await this.getData_" + returnValueArray[1] + "();");
+  }
+  
+  else {
+    file.write(
+      "res = await action." +
         returnValueArray[0] +
         "(this." +
         returnValueArray[1]
     );
     if (returnValueArray.length > 2) {
-      for (let i = 2; i < returnValueArray.length; i++)
+      for (let i = 2; i < returnValueArray.length; i++) {
         file.write("," + returnValueArray[i]);
+      }
     }
-    file.write(");");
+    file.write(");\n");
   }
 }
+
+
 
 function generateSetValueFunctions(pageSelectorFile) {
   for (var i = 0; i < pageSelectorFile.length; i++) {
