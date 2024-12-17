@@ -1820,45 +1820,53 @@ function generategroupDatafunction(group, groupName) {
 }
 
 function dataPatternGenerate(pageSelectorFile, groupName) {
-  file.write("getData_" + groupName + ": async function ()\n{\n");
+  file.write(`getData_${groupName}: async function ()\n{\n`);
   file.write("await logger.logInto(await stackTrace.get());\n");
-  file.write("var obj;\n");
-  file.write("obj = {\n");
-  for (var i = 0; i < pageSelectorFile.length; i++) {
-    if (pageSelectorFile[i].extraInfo.toLowerCase().includes("pattern")) {
-      file.write(
-        pageSelectorFile[i].Label +
-          ": await this." +
-          pageSelectorFile[i].Label +
-          "_Data(),\n"
-      );
-    } else {
-      if (
-        pageSelectorFile[i].tagName.toLowerCase().includes("img") ||
-        pageSelectorFile[i].tagName.toLowerCase().includes("svg")
-      ) {
-        file.write(
-          pageSelectorFile[i].Label +
-            ":(( await action.getElementCount(this." +
-            pageSelectorFile[i].Label +
-            ")) > 0) ? await action.waitForDisplayed(this." +
-            pageSelectorFile[i].Label +
-            ") : false,\n"
-        );
-      } else
-        file.write(
-          pageSelectorFile[i].Label +
-            ":(( await action.getElementCount(this." +
-            pageSelectorFile[i].Label +
-            ")) > 0) ? await action.getText(this." +
-            pageSelectorFile[i].Label +
-            ") : null,\n"
-        );
+  file.write("var results = {};\n");
+
+  // Dynamically group elements by inferred common selectors
+  const selectorGroups = {};
+  for (const element of pageSelectorFile) {
+    const commonSelectorKey = `this.${element.Label}`;
+    if (!selectorGroups[commonSelectorKey]) {
+      selectorGroups[commonSelectorKey] = [];
     }
+    selectorGroups[commonSelectorKey].push({
+      label: element.Label,
+      idxKey: element.idxKey, // Assuming idxKey differentiates instances of the same selector
+      tagName: element.tagName,
+      extraInfo: element.extraInfo,
+    });
   }
-  file.write("}\n return obj; \n},\n\n");
+
+  // Process each group of elements with the same inferred common selector
+  for (const [commonSelector, elements] of Object.entries(selectorGroups)) {
+    file.write(`{ // Scope block to avoid redeclaration errors\n`);
+    file.write(`const commonSelector = ${commonSelector};\n`);
+    file.write(`const elementTypes = ${JSON.stringify(elements.map(el => ({ type: el.label, idxKey: el.idxKey })))};\n`);
+    file.write(`Object.assign(results, await this.processElementTypes(elementTypes, value, commonSelector));\n`);
+    file.write(`}\n`); // Close scope block
+  }
+
+  file.write("return results;\n},\n\n");
   listDataGenerate1(pageSelectorFile);
+  generateProcessElems();
 }
+
+function generateProcessElems() {
+  file.write(`processElementTypes: async function(elementTypes, value, commonSelector) {
+    let results = {};
+    for (const element of elementTypes) {
+        const elementIndex = value[0][element.idxKey];
+        const elementHandle = await action.getKthElement(commonSelector, elementIndex);
+        const elementCount = await action.getElementCount(commonSelector);
+        results[element.type] = elementCount > 0 ? await action.getText(elementHandle) : null;
+        console.log('ELEM-->', elementHandle);
+    }
+    return results;
+  },\n`);
+}
+
 function dataPatternGenerateWithParent(groupSelectorData, groupName, key) {
   selectedText = "";
   for (var j = 0; j < groupSelectorData.length; j++) {
